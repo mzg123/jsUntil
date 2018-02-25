@@ -1,0 +1,19 @@
+{
+  "name": "jsuntil",
+  "version": "1.0.0",
+  "description": "学习zeptojs 历程",
+  "main": "js-until.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mzg123/jsUntil.git"
+  },
+  "author": "mzg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mzg123/jsUntil/issues"
+  },
+  "homepage": "https://github.com/mzg123/jsUntil#readme"
+}
