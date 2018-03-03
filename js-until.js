@@ -84,7 +84,7 @@
 		before: function() {},
 		empty: function() {},
 		anim: function() {},
-    }
+    };
     function(){
 		function ajax() {
 			console.log(3);
