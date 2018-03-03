@@ -85,12 +85,12 @@
 		empty: function() {},
 		anim: function() {},
     }
-    (function(){
+    function(){
 		function ajax() {
 			console.log(3);
 		};
         
-	}());
+	}();
     var adj_ops = {append: 'beforeEnd', prepend: 'afterBegin', before: 'beforeBegin', after: 'afterEnd'};	
     
     $.fn.dom = $.dom;
