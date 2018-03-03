@@ -5,7 +5,7 @@
 			alert(9);
             module.exports = definition();
         } else if(typeof define === 'function' && define.amd) {
-			alert(43);
+			alert(63);
             define(definition);
         } else {
             console.log(this, definition());
