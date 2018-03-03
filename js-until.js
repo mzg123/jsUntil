@@ -2,8 +2,10 @@
     function(name, context, definition) {
         'use strict';
         if(typeof module !== 'undefined' && module.exports) {
+			alert(3);
             module.exports = definition();
         } else if(typeof define === 'function' && define.amd) {
+			alert(44);
             define(definition);
         } else {
             console.log(this, definition());
