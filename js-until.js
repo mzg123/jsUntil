@@ -46,9 +46,9 @@
                 }
             });
         },
-        length: function() {
+        length: (function() {
             return $.dom.length;
-        },
+        })(),
         forEach: function(fn) {
             return $(fn);
         },
