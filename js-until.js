@@ -23,7 +23,6 @@
     }
 	function deleteDom(el) {
 		var index = $.dom.indexOf(el);
-        console.log(index);
 		if (index > -1) {
 			$.dom.splice(index, 1);
 		}
@@ -53,6 +52,20 @@
                 }
             });
         },
+        live: function(event, callback) {
+            var selector = $._;
+            document.body.addEventListener(event, function(e) {
+                var target = event.target;
+                var nodes = [].call(document.querySelectorAll(selector));
+                while(target && nodes.indexOf(target) < 0) {
+                    target = target.parentNode;
+                }
+                if (target && !(target === document)) {
+                    callback.call(target, e);
+                }
+            }, false);
+            return $.fn;
+        },
         forEach: function(fn) {
             return $(fn);
         },
@@ -75,6 +88,11 @@
 			}
 			return $.fn.get(0).classList.contains(className);
 		},
+        toggleClass: function(className) {
+            return $(function(el) {
+                el.classList.toggle(className);
+            });
+        },
 		css: function(style) {
 			return $(function(el) {
 				el.style.cssText += ';' + style; 
