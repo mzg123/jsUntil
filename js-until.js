@@ -27,6 +27,9 @@
 			$.dom.splice(index, 1);
 		}
 	};
+    function classRE(name){
+        return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
+    }
     $.fn = {
         on: function(type, handler, useCapture) {
             useCapture === undefined || (useCapture = false);
@@ -73,14 +76,21 @@
 		get: function(index) {
 			return index === undefined ? this.dom: $.dom[index];
 		},
+        each: function(callback) {
+            return $(function(el) {
+                callback(el);
+            });
+        },
 		addClass: function(className) {
 			return $(function(el) {
 				el.classList.add(className);
+                //!classRE(className).test(el.className) && (el.className += (el.className ? ' ' : '') + className);
 			});
 		},
 		removeClass: function(className) {
 			return $(function(el){
 				el.classList.remove(className);
+                //el.className = el.className.replace(classRE(className), ' ').replace(/^\s+|\s+$/g, '');
 			});
 		},
 		hasClass: function(className) {
