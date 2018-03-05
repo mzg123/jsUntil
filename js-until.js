@@ -16,7 +16,7 @@
             $.dom.forEach(any);
         } else {
 			$._ = any;
-            $.dom = [].slice.apply(document.querySelectorAll(any));
+            $.dom = any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any));
             $.fn.dom = $.dom;
         }
         return $.fn;
@@ -52,19 +52,20 @@
                 }
             });
         },
-        live: function(event, callback) {
-            var selector = $._;
-            document.body.addEventListener(event, function(e) {
-                var target = e.target;
-                var nodes = [].slice.call(document.querySelectorAll(selector));
-                while(target && nodes.indexOf(target) < 0) {
-                    target = target.parentNode;
-                }
-                if (target && !(target === document)) {
-                    callback.call(target, e);
-                }
-            }, false);
-            return $.fn;
+        delegate: function(selector, event, callback) {
+            return $(function(el) {
+                el.addEventListener(event, function(e) {
+                    var target = e.target;
+                    var nodes = [].slice.call(document.querySelectorAll(selector));
+                    while(target && nodes.indexOf(target) < 0) {
+                        target = target.parentNode;
+                    }
+                    if (target && !(target === el) && !(target === document)) {
+                        callback.call(target, e);
+                    }
+                    
+                });
+            });
         },
         forEach: function(fn) {
             return $(fn);
