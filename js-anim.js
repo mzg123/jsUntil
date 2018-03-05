@@ -154,6 +154,11 @@
 		this.duration = opt.duration;
 		this.timeFun = opt.timeFun || 'linear';
 		this.renderFun = opt.renderFun || _defaultRenderFun.bind(this);
+
+		this.onPlay = opt.onPlay;
+		this.onEnd = opt.onEnd;
+		this.onStop = opt.onStop;
+		this.onReset = opt.onReset;
 	};
 	function _renderFun(curT, dT,tF) {
 		var tempV = this.value.map(function(item) {
@@ -165,9 +170,12 @@
 		var curT = Date.now() - this.beginTime;
 		var dT = this.duration;
 		var tF = Tween[this.timeFun];
-        if (curT >= dT) {
-			this.state = 'end';
-            _renderFun.call(this, dT,dT,tF);
+		if (this.state === 'end' || curT > dT) {
+			this.end();	
+		} else if (this.state === 'init') {
+            this.reset();
+		} else if (this.state === 'stop') {
+			this.stop(curT);
 		} else {
 			_renderFun.call(this, curT,dT,tF);
 			window.requestAnimationFrame(_loop.bind(this));
@@ -175,13 +183,44 @@
 	};
 	function _play() {
 		this.state = 'play';
+		this.onPlay && this.onPlay();
 		this.beginTime = Date.now();
 		window.requestAnimationFrame(_loop.bind(this));
 	};
+	function _end() {
+		this.state = 'end';
+		var dT = this.duration;
+		var tF = Tween[this.timeFun];
+		_renderFun.call(this, dT,dT,tF);
+		this.onEnd && this.onEnd();
+	};
+	function _stop(t) {
+		this.state = 'stop';
+		var dT = this.duration;
+		var tF = Tween[this.timeFun];
+		_renderFun.call(this, t,dT,tF);
+		this.onStop && this.onStop();
+	};
+	function _reset() {
+		this.state = 'init';
+		var dT = this.duration;
+        var tF = Tween[this.timeFun];
+		_renderFun.call(this, 0,dT,tF);
+		this.onReset && this.onReset();
+	}
     animC.prototype = {
 		play: function() {
 			_play.bind(this)();
 		},
+		end: function() {
+		    this.state === 'play' ? (this.state = 'end') : _end.bind(this)();
+		},
+		stop: function(t) {
+			this.state === 'play' ? (this.state = 'stop') : _stop.bind(this, t)();
+		},
+		reset: function() {
+			this.state === 'play' ? (this.state = 'init') : _reset.bind(this)();
+		}
 	};
 	
 	return $a;	
