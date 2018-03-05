@@ -55,8 +55,8 @@
         live: function(event, callback) {
             var selector = $._;
             document.body.addEventListener(event, function(e) {
-                var target = event.target;
-                var nodes = [].call(document.querySelectorAll(selector));
+                var target = e.target;
+                var nodes = [].slice.call(document.querySelectorAll(selector));
                 while(target && nodes.indexOf(target) < 0) {
                     target = target.parentNode;
                 }
@@ -70,7 +70,7 @@
             return $(fn);
         },
 		get: function(index) {
-			return $.dom[index||0];
+			return index === undefined ? this.dom: $.dom[index];
 		},
 		addClass: function(className) {
 			return $(function(el) {
@@ -98,6 +98,14 @@
 				el.style.cssText += ';' + style; 
 			});
 		},
+        attr: function(name, value) {
+            if (value === undefined) {
+                return this.get(0).getAttribute(name) || undefined;
+            }
+            return $(function(el) {
+                el.setAttribute(name, value);
+            });
+        },
 		remove: function() {
 			$(function(el) {
 				el.parentNode.removeChild(el);
