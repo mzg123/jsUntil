@@ -76,6 +76,9 @@
 		get: function(index) {
 			return index === undefined ? this.dom: $.dom[index];
 		},
+		index: function(target) {
+			return [].indexOf.call(this.dom, $(target).get(0));
+		},
         each: function(callback) {
             return $(function(el) {
                 callback(el);
