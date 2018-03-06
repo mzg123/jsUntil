@@ -113,13 +113,23 @@
 			});
 		},
         attr: function(name, value) {
-            if (value === undefined) {
-                return this.get(0).getAttribute(name) || undefined;
+            if (typeof name === 'string' && value === undefined) {
+                return this.dom.length > 0 ? this.get(0).getAttribute(name) || undefined : null;
             }
             return $(function(el) {
-                el.setAttribute(name, value);
+				if (typeof name === 'object') {
+					for (key in name) {
+						el.setAttribute(key, name[key]);
+					}
+				} else {
+                    el.setAttribute(name, value);
+				}
             });
         },
+		html: function(html) {
+			return html === void 0 ? (this.dom.length>0 ? this.dom[0].innerHTML : null) :
+					$(function(el){ el.innerHTML = html });
+		},
 		remove: function() {
 			$(function(el) {
 				el.parentNode.removeChild(el);
