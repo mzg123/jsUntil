@@ -138,6 +138,18 @@
 			return $.dom.length;
     	}
     });
+
+
+    var adj_ops = {append: 'beforeEnd', prepend: 'afterBegin', before: 'beforeBegin', after: 'afterEnd'};	
+	for(var key in adj_ops) {
+		$.fn[key] = (function(key){
+			return function(html){
+				return $(function(el){
+					el['insertAdjacent' + (html instanceof Element ? 'Element' : 'HTML')](key,html);
+				})			
+			}
+		})(adj_ops[key]);
+	}
 	//ajax start
     (function(){
           $.ajaxSettings = {
@@ -252,16 +264,6 @@
         
 	})();
 	//ajax end
-    var adj_ops = {append: 'beforeEnd', prepend: 'afterBegin', before: 'beforeBegin', after: 'afterEnd'};	
-	for(var key in adj_ops) {
-		$.fn[key] = (function(key){
-			return function(html){
-				return $(function(el){
-					el.insertAdjacentHTML(key, html);
-				})			
-			}
-		})(adj_ops[key]);
-	}
     
     $.prototype = $.fn;
     return $;
