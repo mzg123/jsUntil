@@ -35,26 +35,30 @@
         e.initEvent(event, true, false);
         target.dispatchEvent(e);
     }
+    var touch = {}, touchTimeout;
     document.ontouchstart = function(e) {
-        var now = Date.now(), t = e.touches[0].target, delta = now - (t.last || now);
-        t.x1 = e.touchs[0].pageX;
-        if (delta > 0 && delta < 800) {
+        var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
+        touch.x1 = e.touchs[0].pageX;
+        if (delta > 0 && delta < 250) {
             dispatch('doubleTop', t);
-            t.last = 0;
+            touch = {};
         } else {
-            t.last = now;
+            touch.last = now;
         }
     }
     document.ontouchmove = function(e) {
-        e.touches[0].x2 = e.touches[0].pageX;
+        touch.x2 = e.touches[0].pageX;
     }
     document.ontouchend = function(e) {
-        var t = e.target;
-        if (t.x2 > 0) {
-            t.x1 - t.x2 > 30 && dispatch('swipeLeft', t);
-            t.x1 -t.x2 < -30 && dispatch('swipeRight', t);
-        } else if (t.last != 0) {
-            dispatch('tap', t);
+        if (touch.x2 > 0) {
+            touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', t);
+            touch.x1 -touch.x2 < -30 && dispatch('swipeRight', t);
+        } else if ('last' in touch) {
+            touchTimeout = setTimeout(function(){
+                touchTimeout = null;
+                dispatch('tap', touch.target);
+                touch = {};
+            }, 250);
         }
     }
     $.fn = {
@@ -111,6 +115,12 @@
             return $(function(el) {
                 callback(el);
             });
+        },
+        prev: function() {
+            return $(this.dom.map(function(el){return el.previousElementSibling}));
+        },
+        next: function() {
+            return $(this.dom.map(function(el){return el.nextElementSibling}));
         },
 		addClass: function(className) {
 			return $(function(el) {
