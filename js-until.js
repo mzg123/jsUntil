@@ -30,6 +30,33 @@
     function classRE(name){
         return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
     }
+    function dispatch(event, target) {
+        var e = document.createEvent('Events');
+        e.initEvent(event, true, false);
+        target.dispatchEvent(e);
+    }
+    document.ontouchstart = function(e) {
+        var now = Date.now(), t = e.touches[0].target, delta = now - (t.last || now);
+        t.x1 = e.touchs[0].pageX;
+        if (delta > 0 && delta < 800) {
+            dispatch('doubleTop', t);
+            t.last = 0;
+        } else {
+            t.last = now;
+        }
+    }
+    document.ontouchmove = function(e) {
+        e.touches[0].x2 = e.touches[0].pageX;
+    }
+    document.ontouchend = function(e) {
+        var t = e.target;
+        if (t.x2 > 0) {
+            t.x1 - t.x2 > 30 && dispatch('swipeLeft', t);
+            t.x1 -t.x2 < -30 && dispatch('swipeRight', t);
+        } else if (t.last != 0) {
+            dispatch('tap', t);
+        }
+    }
     $.fn = {
         on: function(type, handler, useCapture) {
             useCapture === undefined || (useCapture = false);
@@ -70,6 +97,7 @@
                 });
             });
         },
+
         forEach: function(fn) {
             return $(fn);
         },
@@ -166,6 +194,9 @@
 			}
 		})(adj_ops[key]);
 	}
+    ['swipeLeft', 'swipeRight', 'doubleTap', 'tap'].forEach(function(m){
+        $.fn[m] = function(callback) { return this.bind(m, callback);}
+    });
 	//ajax start
     (function(){
           $.ajaxSettings = {
