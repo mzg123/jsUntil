@@ -182,6 +182,7 @@
             });
         },
 		pluck: function(property){ return this.dom.map(function(el){ return el[property] }) },
+		compact: function(){ return $(this.dom) },
 		css: function(style) {
 			return $(function(el) {
 				el.style.cssText += ';' + style; 
