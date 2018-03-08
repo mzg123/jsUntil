@@ -41,7 +41,9 @@
     }
     var touch = {}, touchTimeout;
     document.ontouchstart = function(e) {
-        var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
+        var now = Date.now();
+		touch.target = e.touches[0].target;
+        var delta = now - (touch.last || now);
         touch.x1 = e.touchs[0].pageX;
         touchTimeout && clearTimeout(touchTimeout);
 	
@@ -223,7 +225,10 @@
 				el.innerHTML = '';
 			});
 		},
-		anim: function() {},
+	    anim: function(transform, opacity, dur){
+		    return this.css('-webkit-transition:all '+(dur||0.5)+'s;'+
+			'-webkit-transform:'+transform+';opacity:'+(opacity===0?0:opacity||1));
+		},
     };
 	Object.defineProperty($.fn, 'length', {
     	get: function() {
