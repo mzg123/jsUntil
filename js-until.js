@@ -34,6 +34,37 @@
 	function elSelector(el, selector) {
 		return [].slice.call(el.querySelectorAll(selector));
 	}
+    function dispatch(event, target) {
+        var e = document.createEvent('Events');
+        e.initEvent(event, true, false);
+        target.dispatchEvent(e);
+    }
+    var touch = {}, touchTimeout;
+    document.ontouchstart = function(e) {
+        var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
+        touch.x1 = e.touchs[0].pageX;
+        if (delta > 0 && delta < 250) {
+            dispatch('doubleTop', t);
+            touch = {};
+        } else {
+            touch.last = now;
+        }
+    }
+    document.ontouchmove = function(e) {
+        touch.x2 = e.touches[0].pageX;
+    }
+    document.ontouchend = function(e) {
+        if (touch.x2 > 0) {
+            touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', t);
+            touch.x1 -touch.x2 < -30 && dispatch('swipeRight', t);
+        } else if ('last' in touch) {
+            touchTimeout = setTimeout(function(){
+                touchTimeout = null;
+                dispatch('tap', touch.target);
+                touch = {};
+            }, 250);
+        }
+    }
     $.fn = {
         on: function(type, handler, useCapture) {
             useCapture === undefined || (useCapture = false);
@@ -74,13 +105,13 @@
                 });
             });
         },
-		bind: function(event, callback) {
-			return $(function(el) {
-				event.split(/\s/).forEach(function(item) {
-					el.addEventListener(item, callback, false);
-				});
+	bind: function(event, callback) {
+		return $(function(el) {
+			event.split(/\s/).forEach(function(item) {
+				el.addEventListener(item, callback, false);
 			});
-		},
+		});
+	},
         forEach: function(fn) {
             return $(fn);
         },
@@ -115,6 +146,12 @@
             return $(function(el) {
                 callback(el);
             });
+        },
+        prev: function() {
+            return $(this.dom.map(function(el){return el.previousElementSibling}));
+        },
+        next: function() {
+            return $(this.dom.map(function(el){return el.nextElementSibling}));
         },
 		addClass: function(className) {
 			return $(function(el) {
@@ -162,6 +199,12 @@
 			return html === void 0 ? (this.dom.length>0 ? this.dom[0].innerHTML : null) :
 					$(function(el){ el.innerHTML = html });
 		},
+        show: function() {
+            return this.css('display:block');
+        },
+        hide: function() {
+            return this.css('display:none');
+        },
 		remove: function() {
 			$(function(el) {
 				el.parentNode.removeChild(el);
@@ -193,6 +236,9 @@
 		})(adj_ops[key]);
 	}
     ['width','height'].forEach(function(m){ $.fn[m] = function(){ return this.offset()[m] }});
+    ['swipeLeft', 'swipeRight', 'doubleTap', 'tap'].forEach(function(m){
+        $.fn[m] = function(callback) { return this.bind(m, callback);}
+    });
 	//ajax start
     (function(){
           $.ajaxSettings = {
