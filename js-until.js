@@ -130,6 +130,12 @@
 			return html === void 0 ? (this.dom.length>0 ? this.dom[0].innerHTML : null) :
 					$(function(el){ el.innerHTML = html });
 		},
+        show: function() {
+            return this.css('display:block');
+        },
+        hide: function() {
+            return this.css('display:none');
+        },
 		remove: function() {
 			$(function(el) {
 				el.parentNode.removeChild(el);
