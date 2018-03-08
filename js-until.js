@@ -16,7 +16,8 @@
             $.dom.forEach(any);
         } else {
 			$._ = any;
-            $.dom = any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any));
+            $.dom = any instanceof Array ? any :
+						(any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any)));
             $.fn.dom = $.dom;
         }
         return $.fn;
@@ -30,6 +31,9 @@
     function classRE(name){
         return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
     }
+	function elSelector(el, selector) {
+		return [].slice.call(el.querySelectorAll(selector));
+	}
     $.fn = {
         on: function(type, handler, useCapture) {
             useCapture === undefined || (useCapture = false);
@@ -70,14 +74,42 @@
                 });
             });
         },
+		bind: function(event, callback) {
+			return $(function(el) {
+				event.split(/\s/).forEach(function(item) {
+					el.addEventListener(item, callback, false);
+				});
+			});
+		},
         forEach: function(fn) {
             return $(fn);
         },
 		get: function(index) {
 			return index === undefined ? this.dom: $.dom[index];
 		},
+		find: function(selector) {
+			return $($.dom.map(function(el){ return elSelector(el, selector);})
+				.reduce(function(a, b) {
+					return a.concat(b);
+				}, []));
+		},
+		closest: function(selector) {
+			var el = this.dom[0].parentNode, nodes = elSelector(document, selector);
+			while (el && nodes.indexOf(el) < 0) {
+				el = el.parentNode;
+			}
+ 			return $(el && !(el === document) ? el : []);
+		},
 		index: function(target) {
-			return [].indexOf.call(this.dom, $(target).get(0));
+			return this.dom.indexOf($(target).get(0));
+		},
+		offset: function() {
+			var obj = this.dom[0].getBoundingClientRect();
+			return { left: obj.left+document.body.scrollLeft,
+						top: obj.top+document.body.scrollTop,
+						width: obj.width,
+						height: obj.height
+					};
 		},
         each: function(callback) {
             return $(function(el) {
@@ -160,6 +192,7 @@
 			}
 		})(adj_ops[key]);
 	}
+    ['width','height'].forEach(function(m){ $.fn[m] = function(){ return this.offset()[m] }});
 	//ajax start
     (function(){
           $.ajaxSettings = {
