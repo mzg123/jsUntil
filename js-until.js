@@ -28,9 +28,9 @@
 			$.dom.splice(index, 1);
 		}
 	};
-    function classRE(name){
-        return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
-    }
+	function classRE(name){
+	    return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
+	}
 	function elSelector(el, selector) {
 		return [].slice.call(el.querySelectorAll(selector));
 	}
@@ -43,9 +43,10 @@
     document.ontouchstart = function(e) {
         var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
         touch.x1 = e.touchs[0].pageX;
+        touchTimeout && clearTimeout(touchTimeout);
+	
         if (delta > 0 && delta < 250) {
-            dispatch('doubleTop', t);
-            touch = {};
+	    touch.isDoubleTap = true;
         } else {
             touch.last = now;
         }
@@ -54,7 +55,11 @@
         touch.x2 = e.touches[0].pageX;
     }
     document.ontouchend = function(e) {
-        if (touch.x2 > 0) {
+	if (touch.isDoubleTap) {
+            dispatch('doubleTap', touch.target);
+	    touch = {};
+        }
+        else if (touch.x2 > 0) {
             touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', t);
             touch.x1 -touch.x2 < -30 && dispatch('swipeRight', t);
         } else if ('last' in touch) {
@@ -176,6 +181,7 @@
                 el.classList.toggle(className);
             });
         },
+		pluck: function(property){ return this.dom.map(function(el){ return el[property] }) },
 		css: function(style) {
 			return $(function(el) {
 				el.style.cssText += ';' + style; 
