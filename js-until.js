@@ -19,6 +19,7 @@
             $.dom = any instanceof Array ? any :
 						(any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any)));
             $.fn.dom = $.dom;
+            $.fn.extend = $.extend;
         }
         return $.fn;
     }
@@ -38,6 +39,16 @@
         var e = document.createEvent('Events');
         e.initEvent(event, true, false);
         target.dispatchEvent(e);
+    }
+    $.extend = function(target, src) {
+        for(var k in src){
+            target[k] = src[k];
+        }
+    }
+    function camelize(str){
+        return str.replace(/-+(.)?/g, function(match, chr){
+                return chr ? chr.toUpperCase() : '';
+            });
     }
     var touch = {}, touchTimeout;
     document.ontouchstart = function(e) {
@@ -112,13 +123,13 @@
                 });
             });
         },
-	bind: function(event, callback) {
-		return $(function(el) {
-			event.split(/\s/).forEach(function(item) {
-				el.addEventListener(item, callback, false);
-			});
-		});
-	},
+        bind: function(event, callback) {
+            return $(function(el) {
+                event.split(/\s/).forEach(function(item) {
+                    el.addEventListener(item, callback, false);
+                });
+            });
+        },
         forEach: function(fn) {
             return $(fn);
         },
@@ -185,10 +196,14 @@
         },
 		pluck: function(property){ return this.dom.map(function(el){ return el[property] }) },
 		compact: function(){ return $(this.dom) },
-		css: function(style) {
-			return $(function(el) {
-				el.style.cssText += ';' + style; 
-			});
+		css: function(prop, value) {
+            if(value === void 0 && typeof prop == 'string') return this.dom[0].style[camelize(prop)];
+            var css="", k;
+            for(k in prop) {
+                css += k+':'+prop[k]+';';
+            }
+            if(typeof prop == 'string') css = prop+":"+value;
+            return $(function(el) { el.style.cssText += ';' + css });
 		},
         attr: function(name, value) {
             if (typeof name === 'string' && value === undefined) {
@@ -225,10 +240,16 @@
 				el.innerHTML = '';
 			});
 		},
-	    anim: function(transform, opacity, dur){
-		    return this.css('-webkit-transition:all '+(dur||0.5)+'s;'+
-			'-webkit-transform:'+transform+';opacity:'+(opacity===0?0:opacity||1));
+	    anm: function(transform, opacity, dur){
+            return this.css({'-webkit-transition':'all '+(dur||0.5)+'s',
+                '-webkit-transform':transform,'opacity':(opacity===0?0:opacity||1)});
 		},
+        anim: function(props, dur, ease){
+            var transforms = [], opacity, k;
+            for (k in props) k === 'opacity' ? opacity=props[k] : transforms.push(k+'('+props[k]+')');
+            return this.css({ '-webkit-transition': 'all '+(dur||0.5)+'s '+(ease||''),
+                '-webkit-transform': transforms.join(' '), opacity: opacity });
+        },
     };
 	Object.defineProperty($.fn, 'length', {
     	get: function() {
