@@ -83,6 +83,9 @@
             }, 250);
         }
     }
+    document.ontouchcancel = function(e) {
+        touch = {};
+    }
     $.fn = {
         on: function(type, handler, useCapture) {
             useCapture === undefined || (useCapture = false);
@@ -107,6 +110,10 @@
                     el['on' + type] = null;
                 }
             });
+        },
+        live: function(event, callback) {
+            var selector = $._;
+            return $(document.body).delegate(selector, event, callback);
         },
         delegate: function(selector, event, callback) {
             return $(function(el) {
