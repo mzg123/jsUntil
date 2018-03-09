@@ -40,6 +40,11 @@
         e.initEvent(event, true, false);
         target.dispatchEvent(e);
     }
+    function compact(array) {
+        return array.filter(function(el) {
+            return el !== void 0 && el !== null;
+        });
+    }
     $.extend = function(target, src) {
         for(var k in src){
             target[k] = src[k];
