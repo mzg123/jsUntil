@@ -40,7 +40,7 @@
         var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
         touch.x1 = e.touchs[0].pageX;
         if (delta > 0 && delta < 250) {
-            dispatch('doubleTop', t);
+            dispatch('doubleTop', touch.target);
             touch = {};
         } else {
             touch.last = now;
@@ -51,8 +51,8 @@
     }
     document.ontouchend = function(e) {
         if (touch.x2 > 0) {
-            touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', t);
-            touch.x1 -touch.x2 < -30 && dispatch('swipeRight', t);
+            touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', touch.target);
+            touch.x1 -touch.x2 < -30 && dispatch('swipeRight', touch.target);
         } else if ('last' in touch) {
             touchTimeout = setTimeout(function(){
                 touchTimeout = null;
