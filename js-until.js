@@ -16,7 +16,8 @@
             $.dom.forEach(any);
         } else {
 			$._ = any;
-            $.dom = any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any));
+            $.dom = any instanceof Array ? any :
+						(any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any)));
             $.fn.dom = $.dom;
         }
         return $.fn;
@@ -27,9 +28,12 @@
 			$.dom.splice(index, 1);
 		}
 	};
-    function classRE(name){
-        return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
-    }
+	function classRE(name){
+	    return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
+	}
+	function elSelector(el, selector) {
+		return [].slice.call(el.querySelectorAll(selector));
+	}
     function dispatch(event, target) {
         var e = document.createEvent('Events');
         e.initEvent(event, true, false);
@@ -37,11 +41,14 @@
     }
     var touch = {}, touchTimeout;
     document.ontouchstart = function(e) {
-        var now = Date.now(), touch.target = e.touches[0].target, delta = now - (touch.last || now);
+        var now = Date.now();
+		touch.target = e.touches[0].target;
+        var delta = now - (touch.last || now);
         touch.x1 = e.touchs[0].pageX;
+        touchTimeout && clearTimeout(touchTimeout);
+	
         if (delta > 0 && delta < 250) {
-            dispatch('doubleTop', touch.target);
-            touch = {};
+	    touch.isDoubleTap = true;
         } else {
             touch.last = now;
         }
@@ -50,7 +57,11 @@
         touch.x2 = e.touches[0].pageX;
     }
     document.ontouchend = function(e) {
-        if (touch.x2 > 0) {
+	if (touch.isDoubleTap) {
+            dispatch('doubleTap', touch.target);
+	    touch = {};
+        }
+        else if (touch.x2 > 0) {
             touch.x1 - touch.x2 > 30 && dispatch('swipeLeft', touch.target);
             touch.x1 -touch.x2 < -30 && dispatch('swipeRight', touch.target);
         } else if ('last' in touch) {
@@ -101,15 +112,42 @@
                 });
             });
         },
-
+	bind: function(event, callback) {
+		return $(function(el) {
+			event.split(/\s/).forEach(function(item) {
+				el.addEventListener(item, callback, false);
+			});
+		});
+	},
         forEach: function(fn) {
             return $(fn);
         },
 		get: function(index) {
 			return index === undefined ? this.dom: $.dom[index];
 		},
+		find: function(selector) {
+			return $($.dom.map(function(el){ return elSelector(el, selector);})
+				.reduce(function(a, b) {
+					return a.concat(b);
+				}, []));
+		},
+		closest: function(selector) {
+			var el = this.dom[0].parentNode, nodes = elSelector(document, selector);
+			while (el && nodes.indexOf(el) < 0) {
+				el = el.parentNode;
+			}
+ 			return $(el && !(el === document) ? el : []);
+		},
 		index: function(target) {
-			return [].indexOf.call(this.dom, $(target).get(0));
+			return this.dom.indexOf($(target).get(0));
+		},
+		offset: function() {
+			var obj = this.dom[0].getBoundingClientRect();
+			return { left: obj.left+document.body.scrollLeft,
+						top: obj.top+document.body.scrollTop,
+						width: obj.width,
+						height: obj.height
+					};
 		},
         each: function(callback) {
             return $(function(el) {
@@ -145,6 +183,8 @@
                 el.classList.toggle(className);
             });
         },
+		pluck: function(property){ return this.dom.map(function(el){ return el[property] }) },
+		compact: function(){ return $(this.dom) },
 		css: function(style) {
 			return $(function(el) {
 				el.style.cssText += ';' + style; 
@@ -185,7 +225,10 @@
 				el.innerHTML = '';
 			});
 		},
-		anim: function() {},
+	    anim: function(transform, opacity, dur){
+		    return this.css('-webkit-transition:all '+(dur||0.5)+'s;'+
+			'-webkit-transform:'+transform+';opacity:'+(opacity===0?0:opacity||1));
+		},
     };
 	Object.defineProperty($.fn, 'length', {
     	get: function() {
@@ -204,6 +247,7 @@
 			}
 		})(adj_ops[key]);
 	}
+    ['width','height'].forEach(function(m){ $.fn[m] = function(){ return this.offset()[m] }});
     ['swipeLeft', 'swipeRight', 'doubleTap', 'tap'].forEach(function(m){
         $.fn[m] = function(callback) { return this.bind(m, callback);}
     });
