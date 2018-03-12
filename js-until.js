@@ -236,10 +236,11 @@
 					$(function(el){ el.innerHTML = html });
 		},
         show: function() {
-            return this.css('display:block');
+            return this.css({'display':'block'});
         },
+
         hide: function() {
-            return this.css('display:none');
+            return this.css({'display':'none'});
         },
 		remove: function() {
 			$(function(el) {
