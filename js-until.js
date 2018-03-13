@@ -55,10 +55,14 @@
                 return chr ? chr.toUpperCase() : '';
             });
     }
+    function parentIfText(node) {
+        return 'tagName' in node ? node : node.parentNode;
+    }
+
     var touch = {}, touchTimeout;
     document.ontouchstart = function(e) {
         var now = Date.now();
-		touch.target = e.touches[0].target;
+		touch.target = parentIfText(e.touches[0].target);
         var delta = now - (touch.last || now);
         touch.x1 = e.touchs[0].pageX;
         touchTimeout && clearTimeout(touchTimeout);
