@@ -32,7 +32,7 @@
 	function classRE(name){
 	    return new RegExp("(^|\\s)"+name+"(\\s|$)", 'g');
 	}
-	function elSelector(el, selector) {
+	function $$(el, selector) {
 		return [].slice.call(el.querySelectorAll(selector));
 	}
     function dispatch(event, target) {
@@ -153,13 +153,13 @@
 			return index === undefined ? this.dom: $.dom[index];
 		},
 		find: function(selector) {
-			return $($.dom.map(function(el){ return elSelector(el, selector);})
+			return $($.dom.map(function(el){ return $$(el, selector);})
 				.reduce(function(a, b) {
 					return a.concat(b);
 				}, []));
 		},
 		closest: function(selector) {
-			var el = this.dom[0].parentNode, nodes = elSelector(document, selector);
+			var el = this.dom[0].parentNode, nodes = $$(document, selector);
 			while (el && nodes.indexOf(el) < 0) {
 				el = el.parentNode;
 			}
