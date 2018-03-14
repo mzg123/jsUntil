@@ -125,6 +125,9 @@
         filter: function(selector) {
             return $(this.dom.filter(function(el){ return $$(el.parentNode, selector).indexOf(el)>=0; }));    
         },
+        is: function(selector) {
+            return this.dom.length > 0 && $(this.dom[0]).filter(selector).dom.length > 0;
+        },
 		closest: function(selector) {
 			var el = this.dom[0].parentNode, nodes = $$(document, selector);
 			while (el && nodes.indexOf(el) < 0) {
