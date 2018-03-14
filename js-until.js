@@ -11,17 +11,31 @@
     }
 )('jsUntil', this, function() {
     'use strict';
-    var $ = function(any) {
+    var $ = function(any, context) {
         if(typeof any === 'function') {
             $.dom.forEach(any);
         } else {
-			$._ = any;
+	    	$._ = any;
             $.dom = any instanceof Array ? any :
-						(any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any)));
+	    				(any instanceof Element ? [any] : [].slice.apply(document.querySelectorAll(any)));
             $.fn.dom = $.dom;
             $.fn.extend = $.extend;
         }
         return $.fn;
+      // if (context !== void 0) {
+      //     return $(context).find(any);
+      // }
+      // function fn(any){
+      //     return fn.dom.forEach(any), fn;
+      // }
+      // fn.dom = compact((typeof any == 'function' && 'dom' in any) ?
+      //     any.dom : (any instanceof Array ? any : (any instanceof Element ? [any] : $$(document,fn.selector = any)))
+      // );
+      // $.fn.dom = fn.dom;
+      // $._ = any;
+      // $.fn.extend = $.extend;
+      // $.extend(fn, $.fn);
+      // return fn;
     }
 	function deleteDom(el) {
 		var index = $.dom.indexOf(el);
