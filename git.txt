@@ -54,7 +54,6 @@ Git log -p
 Git diff
 Git blame
 Git ls-tree
-
 悔棋 
 单步悔棋
 1 提交中出现了错别字 有文件忘记提交 有的修改不能提交 测试代码不能提交 。。。。。
