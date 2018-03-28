@@ -1,0 +1,97 @@
+什么是版本库   
+什么是工作区
+git reset
+git checkout
+历史追溯
+其它常用命令
+
+git —version
+git config alias.st status
+git init
+git add 
+Git commit -m “init”
+git rev-parse --git-dir
+Git rev-parse --show-toplevel
+git rev-parse --show-prefix
+git rev-parse --show-cdup
+git config -e
+git commit --allow-empty -m "empty
+git commit --amend
+git clone demo demo-back
+git diff/git diff HEAD /git diff —cached
+git status -s 表示符号的位置不同 说明状态不同
+git ls-tree -l HEAD
+ 什么是HEAD 什么是master 以及git对象的存储机制
+git cat-file -p
+refs 保存引用的命名空间 refs/heads目录下的称为分支
+哈希值 能处理0到两百多万TB的数据量 输出都是固定长度的值 且差异很大
+HEAD代表版本库中最近的一次提交
+^代表父提交。^n代表第n个父提交
+～n也可以代表第n个祖先提交
+A7463bds:path/to/file代表某次提交对应的文件对象
+暂存区中的文件对象，用如下语法 ：path/to/file
+查看提交对应的树对象用git cat-file -p a23d23^{tree}
+
+Git reset 
+Git reset[-q][commit][—]<paths>…       带有paths的选项是用指定commit的某个文件替换暂存区的文件 不会引起引用重置 相当于 git add . 的反操作
+
+Git  reset[—soft —mixed —hard —merge —keep][-q]<commit> 撤销上一次的提交
+
+重置命令修改引用（如master）的游标指向  重置命令reset针对的是头指针 HEAD HEAD指向引用 reset改变引用的指向。
+HEAD始终指向当前工作区的“基础版本”
+Reflow 是HEAD头指针的变迁记录，不是分支
+
+Git checkout
+Git checkout[-q]<commit>[—]<paths>….. 用指定版本的文件覆盖工作区中对应的文件。如果省略commit 则会用暂存区的文件覆盖工作区的文件。否则用指定的文件覆盖暂存区和工作区对应的文件。
+Git checkout [<branch>] 改变HEAD指针  切换分支
+Git checkout[-m][[-b][—orphan]<new_branch>][<start_point>]
+
+Git checkout 汇总显示工作区暂存区 HEAD的差异
+Git checkout —filename 用暂存区的文件 覆盖工作区的文件 相当于add的反操作
+Git checkout . 暂存区的文件覆盖所有工作区的文件，不给用户任何确认机会。
+
+Git log -p
+Git diff
+Git blame
+Git ls-tree
+
+悔棋 
+单步悔棋
+1 提交中出现了错别字 有文件忘记提交 有的修改不能提交 测试代码不能提交 。。。。。
+       git commit —amend    git log -p -1 git checkout HEAD^ file(帮助查看修补的比较)
+多步悔棋
+1.本地多次提交，在最终需要推送到远程库时 需要把一系列本地提交变成一个提交 
+ git reset git commit
+剔除一系列提交中的某一次提交
+1.
+使用git cherry-pick 其含义是从众多的提交中挑选出一个提交应用到当前工作分支中， 相当于将提交导出为补丁文件，然后在当前的HEAD上重放。
+a  git checkout C 将HEAD切换到C 
+b  git cherry-pick master^ 将E 执行拣选操作 在当前HEAD上重放
+c   git cherry-pick master 将F 执行拣选操作 在当前HEAD上重放
+d    git checkout master  将分支切换到master 
+e    git reset —hard HEAD@{1} 将master重新切换到 更改后的分支
+f     git reset —hard F 重新切回 master分支
+
+2.      使用git rebase 对提交执行变基操作，使用指定范围的提交嫁接到另一个提交之上 
+
+git  rebase —onto <newbase><since><till>
+git rebase —continue
+git rebase —skip
+git rebase —abort
+执行过程 首先执行git checkout 切换到 till
+将 <since>..<till>所标示的提交范围写道一个临时文件中 不包括since
+将当前分支强行重置到newbase中 （git reset —hard <newbase>）
+从保存的临时文件中将提交逐一按顺序重新提交到重置之后的分支上
+如果在提交过程中遇到冲突 变基暂停 用户解决冲突 执行git rebase —continue 继续变基操作
+git rebase —onto C E^F /  git rebase —onto C E^master
+git checkout master  将分支切换到master 
+git reset —hard F 重新切回 master分支
+ git reset —hard HEAD@{1} 将master重新切换到 更改后的分支
+git reset —hard F 重新切回 master分支
+
+git reset -i 交互式变基 修改文件
+
+
+丢弃历史
+echo "from A"|git commit-tree A^{tree}
+
