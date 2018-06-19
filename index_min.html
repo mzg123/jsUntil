@@ -34,33 +34,12 @@
 		<div class="part parts"></div>
         <div></div>
     </div>
- <script src="../dist/jsanim.js"></script>
- <script>
-	var tl = jsAnim({
-		duration: 3000,
-		timeFun: 'easeInOutBack',
-		value: [[0, 400],[0, 600]],
-		renderFun: function(v1,v2){
-			if (v1[0] > 50 && v1[1] < 100) {
-				this.reset();
-			}
-			document.querySelector('.con').style.transform='translate('+v1[0]+'px,'+v1[1]+'px)';
-		},
-		onPlay: function() {
-			console.log('play');
-		},
-		onStop: function() {
-			console.log('stop');
-		},
-		onEnd: function() {
-			console.log('end');
-		},
-		onReset: function() {
-			console.log('reset');
-		},
-	});
-	tl.play();
- </script>
+ <script src="./js-until.js"></script>	
+ <script src="./js-ajax.js"></script>	
+ <script src="./js-touch.js"></script>	
+ <script src="./detect.js"></script>	
+ <script src="./js-anim.js"></script>	
+<script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.js"></script>
 </body>
  	
 </html>
